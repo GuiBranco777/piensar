@@ -1,33 +1,76 @@
 "use client"
 
 import { GAMES, type GameId } from "@/lib/games"
-import { getGroupRanking, getGroupScore, getMemberRanking, GROUPS, CURRENT_GROUP_ID } from "@/lib/competition-data"
 import { cn } from "@/lib/utils"
-import { Award, ChevronRight, Crown, Flag, Sparkles, Star, Trophy, Users } from "lucide-react"
+import { Sparkles, Star, ChevronRight } from "lucide-react"
 
- type GameDashboardProps = { userName: string; stars: number; solved: number; onSelect: (id: GameId) => void }
+type GameDashboardProps = {
+  userName: string
+  stars: number
+  onSelect: (id: GameId) => void
+}
 
-export function GameDashboard({ userName, stars, solved, onSelect }: GameDashboardProps) {
-  const currentGroup = GROUPS.find((group) => group.id === CURRENT_GROUP_ID) ?? GROUPS[0]
-  const groupRanking = getGroupRanking()
-  const memberRanking = getMemberRanking(currentGroup, userName, stars)
-  const memberPosition = memberRanking.findIndex((member) => member.name.toLowerCase() === userName.toLowerCase()) + 1
-  const currentGroupPosition = groupRanking.findIndex((group) => group.id === currentGroup.id) + 1
+export function GameDashboard({ userName, stars, onSelect }: GameDashboardProps) {
+  return (
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
+      {/* Boas-vindas */}
+      <section className="flex flex-col gap-4 rounded-4xl bg-primary p-6 text-primary-foreground shadow-sm md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="space-y-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-sm font-semibold">
+            <Sparkles className="size-4" aria-hidden="true" />
+            Bem-vindo(a)!
+          </span>
+          <h1 className="text-balance font-display text-3xl font-bold leading-tight md:text-4xl">
+            Oi, {userName}! Vamos brincar de matemática?
+          </h1>
+          <p className="text-pretty leading-relaxed text-primary-foreground/80">
+            Escolha um jogo na lista ao lado ou aqui embaixo e comece a ganhar estrelas.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3 rounded-3xl bg-primary-foreground/15 px-5 py-4">
+          <Star className="size-8 fill-current" aria-hidden="true" />
+          <div>
+            <p className="font-display text-3xl font-bold leading-none">{stars}</p>
+            <p className="text-sm text-primary-foreground/80">estrelas</p>
+          </div>
+        </div>
+      </section>
 
-  return <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-    <section className="flex flex-col gap-5 rounded-4xl bg-primary p-6 text-primary-foreground shadow-sm md:flex-row md:items-center md:justify-between md:p-8">
-      <div className="space-y-3"><span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-sm font-semibold"><Sparkles aria-hidden="true" />Rodada OBMEP aberta</span><h1 className="text-balance font-display text-3xl font-bold leading-tight md:text-4xl">Oi, {userName}! Pronto para desafiar sua lógica?</h1><p className="max-w-2xl leading-relaxed text-primary-foreground/80">Resolva desafios, ajude seu grupo e suba no ranking da turma.</p></div>
-      <div className="flex shrink-0 items-center gap-3 rounded-3xl bg-primary-foreground/15 px-5 py-4"><Star className="fill-current" aria-hidden="true" /><div><p className="font-display text-3xl font-bold leading-none">{stars}</p><p className="text-sm text-primary-foreground/80">pontos</p></div></div>
-    </section>
-
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="rounded-4xl border border-border bg-card p-6 shadow-sm"><div className="flex items-start justify-between gap-4"><div><p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Meu grupo</p><h2 className="mt-1 font-display text-2xl font-bold">{currentGroup.name}</h2><p className="mt-1 text-sm text-muted-foreground">Código {currentGroup.code} · {currentGroup.members.length + 1} participantes</p></div><div className={cn("flex size-12 items-center justify-center rounded-2xl", currentGroup.accent)}><Users aria-hidden="true" /></div></div><div className="mt-6 grid grid-cols-3 gap-3"><div className="rounded-2xl bg-muted p-3"><p className="text-xs text-muted-foreground">Colocação</p><p className="mt-1 font-display text-2xl font-bold">{currentGroupPosition}º</p></div><div className="rounded-2xl bg-muted p-3"><p className="text-xs text-muted-foreground">Grupo</p><p className="mt-1 font-display text-2xl font-bold">{getGroupScore(currentGroup) + stars}</p></div><div className="rounded-2xl bg-muted p-3"><p className="text-xs text-muted-foreground">Desafios</p><p className="mt-1 font-display text-2xl font-bold">{solved}/5</p></div></div><div className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground"><Flag aria-hidden="true" />Cada acerto vale 25 pontos para você.</div></section>
-
-      <section className="rounded-4xl border border-border bg-card p-6 shadow-sm"><div className="flex items-center justify-between"><div><p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Ranking individual</p><h2 className="mt-1 font-display text-2xl font-bold">Dentro do grupo</h2></div><Award className="text-accent-foreground" aria-hidden="true" /></div><div className="mt-5 flex flex-col gap-3">{memberRanking.slice(0, 4).map((member, index) => <div key={member.name} className={cn("flex items-center gap-3 rounded-2xl p-3", member.name.toLowerCase() === userName.toLowerCase() ? "bg-primary/10" : "bg-muted/60")}><span className="w-5 text-center font-display font-bold text-muted-foreground">{index + 1}</span><span className="flex size-9 items-center justify-center rounded-full bg-card text-xs font-bold">{member.initials}</span><span className="flex-1 font-semibold">{member.name}{member.name.toLowerCase() === userName.toLowerCase() && <Badge className="ml-2" variant="secondary">você</Badge>}</span><span className="font-display font-bold">{member.score}</span></div>)}</div><p className="mt-4 text-sm text-muted-foreground">Você está em {memberPosition}º lugar.</p></section>
+      {/* Grade de jogos */}
+      <section className="space-y-4">
+        <h2 className="font-display text-xl font-bold text-foreground">Escolha um jogo</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {GAMES.map((game) => {
+            const Icon = game.icon
+            return (
+              <button
+                key={game.id}
+                type="button"
+                onClick={() => onSelect(game.id)}
+                className="group flex items-center gap-4 rounded-4xl border border-border bg-card p-5 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              >
+                <span
+                  className={cn(
+                    "flex size-16 shrink-0 items-center justify-center rounded-3xl transition-transform group-hover:scale-105",
+                    game.softBg,
+                    game.color,
+                  )}
+                >
+                  <Icon className="size-8" aria-hidden="true" />
+                </span>
+                <span className="flex flex-1 flex-col">
+                  <span className="font-display text-lg font-bold text-foreground">{game.name}</span>
+                  <span className="text-sm leading-relaxed text-muted-foreground">{game.description}</span>
+                </span>
+                <ChevronRight
+                  className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </button>
+            )
+          })}
+        </div>
+      </section>
     </div>
-
-    <section><div className="mb-4 flex items-end justify-between gap-3"><div><p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Arena de desafios</p><h2 className="font-display text-2xl font-bold">Escolha seu próximo problema</h2></div><span className="rounded-full border border-border px-3 py-1 text-sm font-semibold">{solved} de 5 concluídos</span></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{GAMES.map((game, index) => { const Icon = game.icon; return <button key={game.id} type="button" onClick={() => onSelect(game.id)} className="group flex items-center gap-4 rounded-4xl border border-border bg-card p-5 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"><span className={cn("flex size-14 shrink-0 items-center justify-center rounded-3xl transition-transform group-hover:scale-105", game.softBg, game.color)}><Icon aria-hidden="true" /></span><span className="flex min-w-0 flex-1 flex-col"><span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Desafio {index + 1}</span><span className="font-display text-lg font-bold text-foreground">{game.name}</span><span className="text-sm leading-relaxed text-muted-foreground">{game.description}</span></span><ChevronRight className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" aria-hidden="true" /></button> })}</div></section>
-
-    <section className="rounded-4xl border border-border bg-card p-6 shadow-sm"><div className="flex items-center gap-3"><Trophy className="text-accent-foreground" aria-hidden="true" /><div><p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Ranking dos grupos</p><h2 className="font-display text-2xl font-bold">Quem está na frente?</h2></div></div><div className="mt-5 grid gap-3 md:grid-cols-3">{groupRanking.map((group, index) => <div key={group.id} className={cn("rounded-3xl border p-4", group.id === currentGroup.id ? "border-primary bg-primary/5" : "border-border")}><div className="flex items-center gap-3"><span className="flex size-9 items-center justify-center rounded-xl bg-muted font-display font-bold">{index === 0 ? <Crown aria-hidden="true" /> : `${index + 1}º`}</span><span className="flex-1 font-bold">{group.name}</span></div><div className="mt-4 flex items-end justify-between"><span className="text-sm text-muted-foreground">{group.members.length} jogadores</span><span className="font-display text-xl font-bold">{getGroupScore(group)} pts</span></div></div>)}</div></section>
-  </div>
+  )
 }
