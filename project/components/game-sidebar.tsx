@@ -1,6 +1,6 @@
 "use client"
 
-import { GAMES, type GameId } from "@/lib/games"
+import { GAMES, type GameId, type GameLevel } from "@/lib/games"
 import { Home, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -63,39 +63,46 @@ export function GameSidebar({ activeGame, onSelect, open, onClose }: GameSidebar
           Início
         </button>
 
-        <p className="px-2 pt-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">Jogos</p>
+        <p className="px-2 pt-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">Jogos por nível</p>
 
-        <nav className="flex flex-col gap-1.5">
-          {GAMES.map((game) => {
-            const Icon = game.icon
-            const isActive = activeGame === game.id
+        <nav className="flex min-h-0 flex-col gap-4 overflow-y-auto pr-1" aria-label="Jogos organizados por nível">
+          {(["Iniciante", "Intermediário", "Desafio"] as GameLevel[]).map((level) => {
+            const levelGames = GAMES.filter((game) => game.level === level)
             return (
-              <button
-                key={game.id}
-                type="button"
-                onClick={() => {
-                  onSelect(game.id)
-                  onClose()
-                }}
-                className={cn(
-                  "flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition-colors",
-                  isActive ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex size-10 shrink-0 items-center justify-center rounded-xl",
-                    game.softBg,
-                    game.color,
-                  )}
-                >
-                  <Icon className="size-5" aria-hidden="true" />
-                </span>
-                <span className="flex flex-col">
-                  <span className="font-bold text-sidebar-foreground">{game.name}</span>
-                  <span className="text-xs text-muted-foreground">{game.tagline}</span>
-                </span>
-              </button>
+              <section key={level} aria-labelledby={`sidebar-level-${level}`}>
+                <div className="mb-1.5 flex items-center justify-between px-2">
+                  <h2 id={`sidebar-level-${level}`} className="text-xs font-bold text-sidebar-foreground">{level}</h2>
+                  <span className="text-[11px] font-semibold text-muted-foreground">{levelGames.length}</span>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  {levelGames.map((game) => {
+                    const Icon = game.icon
+                    const isActive = activeGame === game.id
+                    return (
+                      <button
+                        key={game.id}
+                        type="button"
+                        onClick={() => {
+                          onSelect(game.id)
+                          onClose()
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors",
+                          isActive ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",
+                        )}
+                      >
+                        <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl", game.softBg, game.color)}>
+                          <Icon aria-hidden="true" />
+                        </span>
+                        <span className="flex min-w-0 flex-col">
+                          <span className="truncate font-bold text-sidebar-foreground">{game.name}</span>
+                          <span className="truncate text-xs text-muted-foreground">{game.tagline}</span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
             )
           })}
         </nav>
