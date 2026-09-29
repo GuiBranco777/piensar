@@ -6,26 +6,18 @@ import type { Game } from "@/lib/games"
 import { Button } from "@/components/ui/button"
 
 const CHALLENGES: Record<string, { prompt: string; options: string[]; answer: string; hint: string }> = {
-  pattern: {
-    prompt: "Uma sequência começa assim: 2, 5, 10, 17, __. Qual é o próximo número?",
-    options: ["24", "26", "28", "30"], answer: "26", hint: "Observe o quanto aumenta de um termo para o outro: 3, 5, 7...",
-  },
-  bridge: {
-    prompt: "Quatro estudantes atravessam uma ponte à noite. Os tempos são 1, 2, 7 e 10 minutos. Com uma lanterna, no máximo dois atravessam por vez. Qual é o menor tempo total?",
-    options: ["17 minutos", "19 minutos", "20 minutos", "23 minutos"], answer: "17 minutos", hint: "Faça a dupla mais rápida levar a lanterna nas voltas.",
-  },
-  combinations: {
-    prompt: "Ana tem 3 camisetas e 2 bermudas. De quantas maneiras diferentes ela pode escolher uma camiseta e uma bermuda?",
-    options: ["5", "6", "8", "9"], answer: "6", hint: "Para cada camiseta, conte quantas bermudas podem acompanhá-la.",
-  },
-  area: {
-    prompt: "Um quadrado de lado 6 cm foi dividido em 4 quadrados iguais. Qual é a área de cada parte?",
-    options: ["6 cm²", "9 cm²", "12 cm²", "18 cm²"], answer: "9 cm²", hint: "Cada lado das partes mede metade do lado original.",
-  },
-  deduction: {
-    prompt: "Bia, Caio e Duda escolheram frutas diferentes: maçã, pera e uva. Bia não escolheu maçã. Caio não escolheu pera nem uva. Quem escolheu uva?",
-    options: ["Bia", "Caio", "Duda", "Não é possível saber"], answer: "Duda", hint: "Primeiro descubra qual fruta sobrou para Caio.",
-  },
+  "pattern-1": { prompt: "Uma sequência começa assim: 2, 5, 10, 17, __. Qual é o próximo número?", options: ["24", "26", "28", "30"], answer: "26", hint: "Os aumentos são 3, 5, 7..." },
+  "combinations-1": { prompt: "Ana tem 3 camisetas e 2 bermudas. De quantas maneiras pode escolher uma de cada?", options: ["5", "6", "8", "9"], answer: "6", hint: "Para cada camiseta, há duas bermudas possíveis." },
+  "area-1": { prompt: "Um quadrado de lado 6 cm foi dividido em 4 quadrados iguais. Qual é a área de cada parte?", options: ["6 cm²", "9 cm²", "12 cm²", "18 cm²"], answer: "9 cm²", hint: "Cada lado das partes mede metade do lado original." },
+  "bridge-1": { prompt: "Duas pessoas levam 2 e 5 minutos para atravessar uma ponte. Qual o menor tempo para as duas atravessarem com uma lanterna?", options: ["5 minutos", "7 minutos", "10 minutos", "12 minutos"], answer: "5 minutos", hint: "As duas podem atravessar juntas." },
+  "pattern-2": { prompt: "Qual é o próximo termo: 1, 2, 4, 7, 11, __?", options: ["14", "15", "16", "17"], answer: "16", hint: "Os aumentos são 1, 2, 3, 4..." },
+  "combinations-2": { prompt: "Quantos códigos de dois algarismos diferentes podem ser feitos com 1, 2, 3 e 4?", options: ["8", "10", "12", "16"], answer: "12", hint: "Escolha o primeiro e depois o segundo sem repetir." },
+  "area-2": { prompt: "Um retângulo de 8 cm por 5 cm tem um quadrado de lado 2 cm retirado. Qual é a área restante?", options: ["34 cm²", "36 cm²", "38 cm²", "40 cm²"], answer: "36 cm²", hint: "Calcule a área do retângulo e subtraia a do quadrado." },
+  "bridge-2": { prompt: "Quatro estudantes levam 1, 2, 7 e 10 minutos para atravessar. Qual é o menor tempo total?", options: ["17 minutos", "19 minutos", "20 minutos", "23 minutos"], answer: "17 minutos", hint: "Faça a dupla mais rápida levar a lanterna nas voltas." },
+  "pattern-3": { prompt: "Se 2 + 4 = 12, 3 + 5 = 24 e 4 + 6 = 40, então 5 + 7 = ?", options: ["50", "55", "60", "70"], answer: "60", hint: "Observe que cada resultado é o produto dos números multiplicado por 2." },
+  "combinations-3": { prompt: "De quantas formas 3 alunos podem ser escolhidos entre 5 para formar um comitê?", options: ["8", "10", "12", "15"], answer: "10", hint: "A ordem dos alunos no comitê não importa." },
+  "area-3": { prompt: "Um quadrado de área 64 cm² foi dividido em 4 triângulos iguais. Qual é a área de cada triângulo?", options: ["8 cm²", "12 cm²", "16 cm²", "32 cm²"], answer: "16 cm²", hint: "Divida a área total pelo número de partes iguais." },
+  "deduction-1": { prompt: "Bia, Caio e Duda escolheram frutas diferentes. Bia não escolheu maçã. Caio não escolheu pera nem uva. Quem escolheu uva?", options: ["Bia", "Caio", "Duda", "Não é possível saber"], answer: "Duda", hint: "Primeiro descubra qual fruta sobrou para Caio." },
 }
 
 type LogicGameProps = { game: Game; onExit: () => void; onEarnStars: (n: number) => void }
