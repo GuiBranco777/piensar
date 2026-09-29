@@ -10,13 +10,26 @@ import { GameView } from "@/components/game-view"
 
 export default function Page() {
   const [userName, setUserName] = useState<string | null>(null)
+  const [account, setAccount] = useState<{ name: string; password: string } | null>(null)
   const [activeGame, setActiveGame] = useState<GameId | null>(null)
   const [stars, setStars] = useState(0)
   const [solvedIds, setSolvedIds] = useState<Set<GameId>>(new Set())
   const solved = solvedIds.size
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  if (!userName) return <LoginScreen onLogin={setUserName} />
+  function handleAuth(name: string, password: string, mode: "login" | "signup") {
+    if (mode === "signup") {
+      setAccount({ name, password })
+      setUserName(name)
+      return
+    }
+
+    if (account && account.name.toLowerCase() === name.toLowerCase() && account.password === password) {
+      setUserName(account.name)
+    }
+  }
+
+  if (!userName) return <LoginScreen onLogin={handleAuth} />
 
   function handleLogout() {
     setUserName(null)

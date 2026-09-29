@@ -7,17 +7,35 @@ import { Button } from "@/components/ui/button"
 import { Calculator, Sparkles, Star, Rocket } from "lucide-react"
 
 type LoginScreenProps = {
-  onLogin: (name: string) => void
+  onLogin: (name: string, password: string, mode: "login" | "signup") => void
 }
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
+  const [mode, setMode] = useState<"login" | "signup">("signup")
   const [name, setName] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmation, setConfirmation] = useState("")
+  const [error, setError] = useState("")
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = name.trim()
-    if (trimmed.length === 0) return
-    onLogin(trimmed)
+    setError("")
+
+    if (trimmed.length < 2) {
+      setError("Digite um nome com pelo menos 2 caracteres.")
+      return
+    }
+    if (password.length < 6) {
+      setError("A senha precisa ter pelo menos 6 caracteres.")
+      return
+    }
+    if (mode === "signup" && password !== confirmation) {
+      setError("As senhas não conferem.")
+      return
+    }
+
+    onLogin(trimmed, password, mode)
   }
 
   return (
@@ -67,14 +85,18 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               <Sparkles className="size-4" aria-hidden="true" />
               Vamos começar!
             </span>
-            <h1 className="font-display text-3xl font-bold text-foreground">Olá! Qual é o seu nome?</h1>
+            <h1 className="font-display text-3xl font-bold text-foreground">
+              {mode === "signup" ? "Crie sua conta" : "Entre na sua conta"}
+            </h1>
             <p className="leading-relaxed text-muted-foreground">
-              Digite seu primeiro nome para entrar e brincar de aprender.
+              {mode === "signup"
+                ? "Use apenas seu nome e uma senha para começar a aprender."
+                : "Informe seu nome e senha para continuar seus desafios."}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-sm font-semibold text-foreground">
                 Seu nome
               </label>
@@ -84,24 +106,71 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex.: Ana, Pedro, Bia..."
-                autoComplete="off"
+                autoComplete="username"
                 autoFocus
                 maxLength={24}
                 className="w-full rounded-2xl border-2 border-input bg-background px-4 py-3 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
               />
             </div>
 
+            <div className="flex flex-col gap-2">
+              <label htmlFor="password" className="text-sm font-semibold text-foreground">
+                Senha
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Pelo menos 6 caracteres"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                className="w-full rounded-2xl border-2 border-input bg-background px-4 py-3 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+              />
+            </div>
+
+            {mode === "signup" && (
+              <div className="flex flex-col gap-2">
+                <label htmlFor="confirmation" className="text-sm font-semibold text-foreground">
+                  Confirme sua senha
+                </label>
+                <input
+                  id="confirmation"
+                  type="password"
+                  value={confirmation}
+                  onChange={(e) => setConfirmation(e.target.value)}
+                  placeholder="Digite a senha novamente"
+                  autoComplete="new-password"
+                  className="w-full rounded-2xl border-2 border-input bg-background px-4 py-3 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+                />
+              </div>
+            )}
+
+            {error && <p className="text-sm font-medium text-destructive" role="alert">{error}</p>}
+
             <Button
               type="submit"
-              disabled={name.trim().length === 0}
+              disabled={name.trim().length < 2 || password.length < 6 || (mode === "signup" && confirmation.length < 6)}
               className="h-12 w-full rounded-2xl text-lg font-bold"
             >
-              Entrar para brincar
+              {mode === "signup" ? "Criar conta e brincar" : "Entrar para brincar"}
             </Button>
           </form>
 
+          <button
+            type="button"
+            onClick={() => {
+              setMode((current) => (current === "signup" ? "login" : "signup"))
+              setError("")
+              setPassword("")
+              setConfirmation("")
+            }}
+            className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            {mode === "signup" ? "Já tenho uma conta" : "Quero criar uma conta"}
+          </button>
+
           <p className="text-center text-xs leading-relaxed text-muted-foreground">
-            Não pedimos senha nem dados pessoais. É só o seu nome para deixar tudo mais divertido!
+            Usamos somente seu nome e senha. Nenhum e-mail ou dado pessoal é necessário.
           </p>
         </section>
       </div>
