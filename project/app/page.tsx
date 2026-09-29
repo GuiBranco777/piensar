@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { GameId } from "@/lib/games"
+import { GAMES, type GameId } from "@/lib/games"
 import { LoginScreen } from "@/components/login-screen"
 import { SiteHeader } from "@/components/site-header"
 import { GameSidebar } from "@/components/game-sidebar"
