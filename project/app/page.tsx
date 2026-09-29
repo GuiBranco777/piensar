@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { GameId } from "@/lib/games"
+import { GAMES, type GameId } from "@/lib/games"
 import { LoginScreen } from "@/components/login-screen"
 import { SiteHeader } from "@/components/site-header"
 import { GameSidebar } from "@/components/game-sidebar"
@@ -10,25 +10,44 @@ import { GameView } from "@/components/game-view"
 
 export default function Page() {
   const [userName, setUserName] = useState<string | null>(null)
+  const [account, setAccount] = useState<{ name: string; password: string } | null>(null)
   const [activeGame, setActiveGame] = useState<GameId | null>(null)
   const [stars, setStars] = useState(0)
-  const [solved, setSolved] = useState(0)
+  const [solvedIds, setSolvedIds] = useState<Set<GameId>>(new Set())
+  const solved = solvedIds.size
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  if (!userName) return <LoginScreen onLogin={setUserName} />
+  function handleAuth(name: string, password: string, mode: "login" | "signup") {
+    if (mode === "signup") {
+      setAccount({ name, password })
+      setUserName(name)
+      return
+    }
+
+    if (account && account.name.toLowerCase() === name.toLowerCase() && account.password === password) {
+      setUserName(account.name)
+    }
+  }
+
+  if (!userName) return <LoginScreen onLogin={handleAuth} />
 
   function handleLogout() {
     setUserName(null)
     setActiveGame(null)
     setStars(0)
-    setSolved(0)
+    setSolvedIds(new Set())
     setSidebarOpen(false)
   }
 
-  function handleEarnStars(points: number) {
-    setStars((current) => current + points)
-    setSolved((current) => Math.min(5, current + 1))
+  function handleEarnStars(gameId: GameId, points: number) {
+    setSolvedIds((current) => {
+      if (current.has(gameId)) return current
+      const next = new Set(current)
+      next.add(gameId)
+      setStars((value) => value + points)
+      return next
+    })
   }
 
-  return <div className="min-h-dvh"><SiteHeader userName={userName} stars={stars} onLogout={handleLogout} onLoginClick={() => {}} onToggleSidebar={() => setSidebarOpen((value) => !value)} /><div className="mx-auto flex w-full max-w-7xl"><GameSidebar activeGame={activeGame} onSelect={setActiveGame} open={sidebarOpen} onClose={() => setSidebarOpen(false)} /><main className="flex-1 p-4 md:p-8">{activeGame ? <GameView gameId={activeGame} onExit={() => setActiveGame(null)} onEarnStars={handleEarnStars} /> : <GameDashboard userName={userName} stars={stars} solved={solved} onSelect={setActiveGame} />}</main></div></div>
+  return <div className="min-h-dvh"><SiteHeader userName={userName} stars={stars} onLogout={handleLogout} onLoginClick={() => {}} onToggleSidebar={() => setSidebarOpen((value) => !value)} /><div className="mx-auto flex w-full max-w-7xl"><GameSidebar activeGame={activeGame} onSelect={setActiveGame} open={sidebarOpen} onClose={() => setSidebarOpen(false)} /><main className="flex-1 p-4 md:p-8">{activeGame ? <GameView gameId={activeGame} onExit={() => setActiveGame(null)} onEarnStars={handleEarnStars} /> : <GameDashboard userName={userName} stars={stars} solved={solved} solvedIds={solvedIds} onSelect={setActiveGame} />}</main></div></div>
 }
