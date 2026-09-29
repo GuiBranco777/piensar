@@ -48,7 +48,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             </li>
             <li className="flex items-center gap-3">
               <Rocket className="size-5 shrink-0" aria-hidden="true" />
-              5 jogos para explorar
+              28 desafios para explorar
             </li>
           </ul>
         </section>

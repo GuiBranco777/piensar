@@ -27,7 +27,7 @@ export default function Page() {
 
   function handleEarnStars(points: number) {
     setStars((current) => current + points)
-    setSolved((current) => Math.min(5, current + 1))
+    setSolved((current) => Math.min(GAMES.length, current + 1))
   }
 
   return <div className="min-h-dvh"><SiteHeader userName={userName} stars={stars} onLogout={handleLogout} onLoginClick={() => {}} onToggleSidebar={() => setSidebarOpen((value) => !value)} /><div className="mx-auto flex w-full max-w-7xl"><GameSidebar activeGame={activeGame} onSelect={setActiveGame} open={sidebarOpen} onClose={() => setSidebarOpen(false)} /><main className="flex-1 p-4 md:p-8">{activeGame ? <GameView gameId={activeGame} onExit={() => setActiveGame(null)} onEarnStars={handleEarnStars} /> : <GameDashboard userName={userName} stars={stars} solved={solved} onSelect={setActiveGame} />}</main></div></div>
