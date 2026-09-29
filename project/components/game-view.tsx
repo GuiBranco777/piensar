@@ -6,11 +6,11 @@ import { LogicGame } from "./games/logic-game"
 type GameViewProps = {
   gameId: GameId
   onExit: () => void
-  onEarnStars: (n: number) => void
+  onEarnStars: (gameId: GameId, n: number) => void
 }
 
 export function GameView({ gameId, onExit, onEarnStars }: GameViewProps) {
   const game = getGame(gameId)
 
-  return <LogicGame key={gameId} game={game} onExit={onExit} onEarnStars={onEarnStars} />
+  return <LogicGame key={gameId} game={game} onExit={onExit} onEarnStars={(points) => onEarnStars(gameId, points)} />
 }
