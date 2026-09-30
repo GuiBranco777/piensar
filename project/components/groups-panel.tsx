@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { createGroup, getCompetitionData, joinGroup } from "@/app/actions/groups"
+import { createGroup, getCompetitionData, joinGroup, leaveGroup } from "@/app/actions/groups"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Crown, Copy, Flag, Medal, Shield, Swords, Trophy, Users, UserPlus } from "lucide-react"
@@ -51,6 +51,20 @@ export function GroupsPanel({ onChanged }: Props) {
     setMessage(`Código ${code} copiado.`)
   }
 
+  function handleLeave(groupId: number, name: string) {
+    if (!window.confirm(`Sair do clã ${name}?`)) return
+    startTransition(async () => {
+      try {
+        await leaveGroup(groupId)
+        setMessage(`Você saiu do clã ${name}.`)
+        await refresh()
+        onChanged()
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : "Não foi possível sair do clã.")
+      }
+    })
+  }
+
   const activeGroup = groups[0]
   const activeMembers = activeGroup ? members.filter((member) => member.groupId === activeGroup.groupId) : []
 
@@ -86,7 +100,7 @@ export function GroupsPanel({ onChanged }: Props) {
 
           <div className="rounded-3xl border border-border bg-muted/30 p-5">
             <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Meus clãs</p><h3 className="font-display text-xl font-bold">Ranking dos clãs</h3></div><Trophy className="text-accent-foreground" aria-hidden="true" /></div>
-            {groups.length === 0 ? <div className="flex flex-col items-center gap-2 py-7 text-center text-muted-foreground"><Flag aria-hidden="true" /><p className="text-sm">Você ainda não participa de nenhum clã.</p></div> : <div className="flex flex-col gap-2">{groups.map((group, index) => <div key={group.code} className={cn("flex items-center gap-3 rounded-2xl border p-3", index === 0 ? "border-primary/30 bg-primary/5" : "border-border bg-background")}><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-bold">{index === 0 ? <Crown aria-hidden="true" /> : `${index + 1}º`}</span><div className="min-w-0 flex-1"><p className="truncate font-bold">{group.name}</p><p className="text-xs text-muted-foreground">{group.code} · {members.filter((member) => member.groupId === group.groupId).length} membros</p></div><span className="font-display font-bold">{group.score} pts</span><button type="button" onClick={() => void copyCode(group.code)} className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label={`Copiar código ${group.code}`}><Copy aria-hidden="true" /></button></div>)}</div>}
+            {groups.length === 0 ? <div className="flex flex-col items-center gap-2 py-7 text-center text-muted-foreground"><Flag aria-hidden="true" /><p className="text-sm">Você ainda não participa de nenhum clã.</p></div> : <div className="flex flex-col gap-2">{groups.map((group, index) => <div key={group.code} className={cn("flex items-center gap-3 rounded-2xl border p-3", index === 0 ? "border-primary/30 bg-primary/5" : "border-border bg-background")}><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-bold">{index === 0 ? <Crown aria-hidden="true" /> : `${index + 1}º`}</span><div className="min-w-0 flex-1"><p className="truncate font-bold">{group.name}</p><p className="text-xs text-muted-foreground">{group.code} · {members.filter((member) => member.groupId === group.groupId).length} membros</p></div><span className="font-display font-bold">{group.score} pts</span><div className="flex items-center gap-1"><button type="button" onClick={() => void copyCode(group.code)} className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label={`Copiar código ${group.code}`}><Copy aria-hidden="true" /></button><button type="button" disabled={pending} onClick={() => handleLeave(group.groupId, group.name)} className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={`Sair do clã ${group.name}`}><Flag aria-hidden="true" /></button></div></div>)}</div>}
           </div>
         </div>
 

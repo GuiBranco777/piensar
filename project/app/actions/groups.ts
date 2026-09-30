@@ -30,6 +30,20 @@ export async function joinGroup(code: string) {
   return group
 }
 
+export async function recordCompletion(gameId: string, stars: number) {
+  const userId = await getUserId()
+  const existing = await db.select({ id: completions.id }).from(completions).where(and(eq(completions.userId, userId), eq(completions.gameId, gameId))).limit(1)
+  if (existing.length > 0) return { recorded: false }
+  await db.insert(completions).values({ userId, gameId, stars, correct: 1, createdAt: new Date() })
+  return { recorded: true }
+}
+
+export async function leaveGroup(groupId: number) {
+  const userId = await getUserId()
+  await db.delete(groupMembers).where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
+  return { left: true }
+}
+
 export async function getCompetitionData() {
   const userId = await getUserId()
   const memberships = await db.select({ group: groups }).from(groupMembers).innerJoin(groups, eq(groupMembers.groupId, groups.id)).where(eq(groupMembers.userId, userId))
