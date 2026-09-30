@@ -12,7 +12,7 @@ type LoginScreenProps = {
 }
 
 function accountEmail(name: string) {
-  return `${name.trim().toLowerCase().replace(/\s+/g, ".")}@piensar.local`
+  return `${name.trim().toLowerCase().replace(/\s+/g, ".")}@piensar.app`
 }
 
 export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
