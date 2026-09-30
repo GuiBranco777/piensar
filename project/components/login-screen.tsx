@@ -12,7 +12,15 @@ type LoginScreenProps = {
 }
 
 function accountEmail(name: string) {
-  return `${name.trim().toLowerCase().replace(/\s+/g, ".")}@piensar.app`
+  const localPart = name
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ".")
+    .replace(/^\.+|\.+$/g, "")
+
+  return `${localPart || "aluno"}@piensar.app`
 }
 
 export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
@@ -31,8 +39,8 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
       setError("Digite um nome com pelo menos 2 caracteres.")
       return
     }
-    if (password.length < 6) {
-      setError("A senha precisa ter pelo menos 6 caracteres.")
+    if (password.length < 8) {
+      setError("A senha precisa ter pelo menos 8 caracteres.")
       return
     }
     if (mode === "signup" && password !== confirmation) {
@@ -139,7 +147,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Pelo menos 6 caracteres"
+                placeholder="Pelo menos 8 caracteres"
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 className="w-full rounded-2xl border-2 border-input bg-background px-4 py-3 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
               />
@@ -166,7 +174,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
 
             <Button
               type="submit"
-              disabled={name.trim().length < 2 || password.length < 6 || (mode === "signup" && confirmation.length < 6)}
+              disabled={name.trim().length < 2 || password.length < 8 || (mode === "signup" && confirmation.length < 8)}
               className="h-12 w-full rounded-2xl text-lg font-bold"
             >
               {mode === "signup" ? "Criar conta e brincar" : "Entrar para brincar"}
