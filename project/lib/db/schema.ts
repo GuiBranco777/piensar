@@ -21,7 +21,7 @@ export const groupMembers = pgTable("groupMember", {
 }, (table) => ({ membership: unique().on(table.groupId, table.userId) }))
 
 export const completions = pgTable("completion", {
-  id: integer("id").primaryKey(),
+  id: serial("id").primaryKey(),
   userId: text("userId").notNull(),
   gameId: text("gameId").notNull(),
   stars: integer("stars").notNull(),

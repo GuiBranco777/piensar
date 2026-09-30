@@ -14,6 +14,8 @@ async function getUserId() {
 
 export async function createGroup(name: string) {
   const userId = await getUserId()
+  const currentMembership = await db.select({ id: groupMembers.id }).from(groupMembers).where(eq(groupMembers.userId, userId)).limit(1)
+  if (currentMembership.length > 0) throw new Error("Você já participa de um clã. Saia dele antes de criar outro.")
   const cleanName = name.trim().slice(0, 60)
   if (cleanName.length < 3) throw new Error("O nome precisa ter pelo menos 3 caracteres.")
   const code = `${cleanName.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "").slice(0, 3).toUpperCase()}-${Math.floor(10 + Math.random() * 90)}`
@@ -26,6 +28,8 @@ export async function joinGroup(code: string) {
   const userId = await getUserId()
   const [group] = await db.select().from(groups).where(eq(groups.code, code.trim().toUpperCase())).limit(1)
   if (!group) throw new Error("Código de grupo não encontrado.")
+  const currentMembership = await db.select({ id: groupMembers.id }).from(groupMembers).where(eq(groupMembers.userId, userId)).limit(1)
+  if (currentMembership.length > 0) throw new Error("Você já participa de um clã. Saia dele antes de entrar em outro.")
   await db.insert(groupMembers).values({ groupId: group.id, userId, joinedAt: new Date() }).onConflictDoNothing()
   return group
 }
@@ -35,7 +39,8 @@ export async function recordCompletion(gameId: string, stars: number) {
   const existing = await db.select({ id: completions.id }).from(completions).where(and(eq(completions.userId, userId), eq(completions.gameId, gameId))).limit(1)
   if (existing.length > 0) return { recorded: false }
   await db.insert(completions).values({ userId, gameId, stars, correct: 1, createdAt: new Date() })
-  return { recorded: true }
+  const membership = await db.select({ groupId: groupMembers.groupId }).from(groupMembers).where(eq(groupMembers.userId, userId)).limit(1)
+  return { recorded: true, groupId: membership[0]?.groupId ?? null }
 }
 
 export async function leaveGroup(groupId: number) {
