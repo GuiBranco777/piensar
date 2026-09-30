@@ -5,19 +5,24 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Calculator, Sparkles, Star, Rocket } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
 
 type LoginScreenProps = {
-  onLogin: (name: string, password: string, mode: "login" | "signup") => void
+  onAuthenticated: () => void
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+function accountEmail(name: string) {
+  return `${name.trim().toLowerCase().replace(/\s+/g, ".")}@piensar.local`
+}
+
+export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
   const [mode, setMode] = useState<"login" | "signup">("signup")
   const [name, setName] = useState("")
   const [password, setPassword] = useState("")
   const [confirmation, setConfirmation] = useState("")
   const [error, setError] = useState("")
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = name.trim()
     setError("")
@@ -35,7 +40,19 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       return
     }
 
-    onLogin(trimmed, password, mode)
+    const email = accountEmail(trimmed)
+    const result = mode === "signup"
+      ? await authClient.signUp.email({ email, password, name: trimmed })
+      : await authClient.signIn.email({ email, password })
+
+    if (result.error) {
+      setError(mode === "signup"
+        ? "Não foi possível criar esta conta. Tente outro nome."
+        : "Nome ou senha incorretos.")
+      return
+    }
+
+    onAuthenticated()
   }
 
   return (
