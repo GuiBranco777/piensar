@@ -7,32 +7,23 @@ import { SiteHeader } from "@/components/site-header"
 import { GameSidebar } from "@/components/game-sidebar"
 import { GameDashboard } from "@/components/game-dashboard"
 import { GameView } from "@/components/game-view"
+import { authClient } from "@/lib/auth-client"
 
 export default function Page() {
-  const [userName, setUserName] = useState<string | null>(null)
-  const [account, setAccount] = useState<{ name: string; password: string } | null>(null)
+  const { data: session, isPending } = authClient.useSession()
   const [activeGame, setActiveGame] = useState<GameId | null>(null)
   const [stars, setStars] = useState(0)
   const [solvedIds, setSolvedIds] = useState<Set<GameId>>(new Set())
   const solved = solvedIds.size
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  function handleAuth(name: string, password: string, mode: "login" | "signup") {
-    if (mode === "signup") {
-      setAccount({ name, password })
-      setUserName(name)
-      return
-    }
+  const userName = session?.user.name ?? null
 
-    if (account && account.name.toLowerCase() === name.toLowerCase() && account.password === password) {
-      setUserName(account.name)
-    }
-  }
+  if (isPending) return <main className="flex min-h-dvh items-center justify-center text-muted-foreground">Carregando sua conta...</main>
+  if (!userName) return <LoginScreen onAuthenticated={() => window.location.reload()} />
 
-  if (!userName) return <LoginScreen onLogin={handleAuth} />
-
-  function handleLogout() {
-    setUserName(null)
+  async function handleLogout() {
+    await authClient.signOut()
     setActiveGame(null)
     setStars(0)
     setSolvedIds(new Set())
