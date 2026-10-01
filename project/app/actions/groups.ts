@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import { groupMembers, groups, users, completions } from "@/lib/db/schema"
 import { and, desc, eq, sql } from "drizzle-orm"
 import { headers } from "next/headers"
+import { getGame, type GameId } from "@/lib/games"
 
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -38,7 +39,8 @@ export async function recordCompletion(gameId: string, stars: number) {
   const userId = await getUserId()
   const existing = await db.select({ id: completions.id }).from(completions).where(and(eq(completions.userId, userId), eq(completions.gameId, gameId))).limit(1)
   if (existing.length > 0) return { recorded: false }
-  await db.insert(completions).values({ userId, gameId, stars, correct: 1, createdAt: new Date() })
+  const difficulty = getGame(gameId as GameId).level
+  await db.insert(completions).values({ userId, gameId, difficulty, stars, correct: 1, createdAt: new Date() })
   const membership = await db.select({ groupId: groupMembers.groupId }).from(groupMembers).where(eq(groupMembers.userId, userId)).limit(1)
   return { recorded: true, groupId: membership[0]?.groupId ?? null }
 }
@@ -47,6 +49,14 @@ export async function leaveGroup(groupId: number) {
   const userId = await getUserId()
   await db.delete(groupMembers).where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
   return { left: true }
+}
+
+export async function getUserProgress() {
+  const userId = await getUserId()
+  return db.select({ gameId: completions.gameId, stars: completions.stars, createdAt: completions.createdAt })
+    .from(completions)
+    .where(eq(completions.userId, userId))
+    .orderBy(desc(completions.createdAt))
 }
 
 export async function getCompetitionData() {

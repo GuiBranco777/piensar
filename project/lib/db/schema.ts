@@ -24,6 +24,7 @@ export const completions = pgTable("completion", {
   id: serial("id").primaryKey(),
   userId: text("userId").notNull(),
   gameId: text("gameId").notNull(),
+  difficulty: text("difficulty").notNull(),
   stars: integer("stars").notNull(),
   correct: integer("correct").notNull(),
   createdAt: timestamp("createdAt").notNull(),
