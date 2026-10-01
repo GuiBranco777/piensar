@@ -49,6 +49,14 @@ export async function leaveGroup(groupId: number) {
   return { left: true }
 }
 
+export async function getUserProgress() {
+  const userId = await getUserId()
+  return db.select({ gameId: completions.gameId, stars: completions.stars, createdAt: completions.createdAt })
+    .from(completions)
+    .where(eq(completions.userId, userId))
+    .orderBy(desc(completions.createdAt))
+}
+
 export async function getCompetitionData() {
   const userId = await getUserId()
   const memberships = await db.select({ group: groups }).from(groupMembers).innerJoin(groups, eq(groupMembers.groupId, groups.id)).where(eq(groupMembers.userId, userId))
