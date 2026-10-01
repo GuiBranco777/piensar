@@ -27,7 +27,7 @@ export default function Page() {
 
   const savedIds = new Set((progress ?? []).map((item) => item.gameId as GameId))
   const displayedSolvedIds = savedIds.size > 0 ? new Set([...savedIds, ...solvedIds]) : solvedIds
-  const displayedStars = progress ? progress.reduce((total, item) => total + item.stars, 0) + stars : stars
+  const displayedStars = progress.length > 0 ? progress.reduce((total, item) => total + item.stars, 0) : stars
   const displayedSolved = displayedSolvedIds.size
 
   if (isPending) return <main className="flex min-h-dvh items-center justify-center text-muted-foreground">Carregando sua conta...</main>
@@ -41,12 +41,11 @@ export default function Page() {
     setSidebarOpen(false)
   }
 
-  function handleEarnStars(gameId: GameId, points: number) {
+  function handleEarnStars(gameId: GameId, _points: number) {
     setSolvedIds((current) => {
       if (current.has(gameId)) return current
       const next = new Set(current)
       next.add(gameId)
-      setStars((value) => value + points)
       return next
     })
     void getUserProgress().then(setProgress)
