@@ -115,10 +115,10 @@ export function GroupsPanel({ onChanged }: Props) {
 
       <div className="border-t border-border bg-muted/20 px-6 py-6 sm:px-8">
         <div className="mb-4 flex items-end justify-between gap-4">
-          <div><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Todos os jogadores</p><h3 className="font-display text-xl font-bold">Ranking geral</h3></div>
+          <div><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Ranking global</p><h3 className="font-display text-xl font-bold">Todos os jogadores</h3></div>
           <Trophy className="text-primary" aria-hidden="true" />
         </div>
-        {globalPlayers.length === 0 ? <p className="py-4 text-sm text-muted-foreground">Ainda não há pontuações registradas.</p> : <div className="grid gap-2 md:grid-cols-2">{globalPlayers.slice(0, 10).map((player, index) => <div key={player.userId} className={cn("flex items-center gap-3 rounded-2xl border p-3", index === 0 ? "border-primary/30 bg-primary/5" : "border-border bg-background")}><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-bold">{index < 3 ? <Medal aria-hidden="true" /> : `${index + 1}º`}</span><div className="min-w-0 flex-1"><p className="truncate font-semibold">{player.name}</p><p className="text-xs text-muted-foreground">{player.completed} {player.completed === 1 ? "fase concluída" : "fases concluídas"}</p></div><span className="font-display font-bold">{player.score} pts</span></div>)}</div>}
+        {globalPlayers.length === 0 ? <p className="py-4 text-sm text-muted-foreground">Ainda não há pontuações registradas. Resolva um desafio para entrar no ranking.</p> : <div className="grid gap-2 md:grid-cols-2">{globalPlayers.map((player, index) => <div key={player.userId} className={cn("flex items-center gap-3 rounded-2xl border p-3", index === 0 ? "border-primary/30 bg-primary/5" : "border-border bg-background")}><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-bold">{index < 3 ? <Medal aria-hidden="true" /> : `${index + 1}º`}</span><div className="min-w-0 flex-1"><p className="truncate font-semibold">{player.name}</p><p className="text-xs text-muted-foreground">{player.completed} {player.completed === 1 ? "fase concluída" : "fases concluídas"}</p></div><span className="font-display font-bold">{player.score} pts</span></div>)}</div>}
       </div>
     </section>
   )
