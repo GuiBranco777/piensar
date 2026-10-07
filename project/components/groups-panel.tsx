@@ -8,6 +8,7 @@ import { Crown, Copy, Flag, Medal, Shield, Swords, Trophy, Users, UserPlus } fro
 
 type Member = { groupId: number; userId: string; name: string; score: number }
 type Group = { groupId: number; name: string; code: string; score: number }
+type GlobalPlayer = { userId: string; name: string; score: number; completed: number }
 type Props = { onChanged: () => void }
 
 export function GroupsPanel({ onChanged }: Props) {
@@ -16,6 +17,7 @@ export function GroupsPanel({ onChanged }: Props) {
   const [message, setMessage] = useState("")
   const [groups, setGroups] = useState<Group[]>([])
   const [members, setMembers] = useState<Member[]>([])
+  const [globalPlayers, setGlobalPlayers] = useState<GlobalPlayer[]>([])
   const [pending, startTransition] = useTransition()
 
   async function refresh() {
@@ -23,6 +25,7 @@ export function GroupsPanel({ onChanged }: Props) {
       const data = await getCompetitionData()
       setGroups(data.groupRows.map((group) => ({ ...group, score: Number(group.score) })))
       setMembers(data.memberRows.map((member) => ({ ...member, score: Number(member.score) })))
+      setGlobalPlayers(data.globalRows.map((player) => ({ ...player, score: Number(player.score), completed: Number(player.completed) })))
     } catch {
       setMessage("Entre na sua conta para acessar os clãs.")
     }
@@ -108,6 +111,14 @@ export function GroupsPanel({ onChanged }: Props) {
           <div className="mb-5 flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Clã em destaque</p><h3 className="font-display text-xl font-bold">{activeGroup?.name ?? "Monte sua equipe"}</h3></div><Users className="text-primary" aria-hidden="true" /></div>
           {activeGroup ? <><div className="mb-4 flex items-center justify-between rounded-2xl bg-primary/5 px-4 py-3"><span className="text-sm text-muted-foreground">Código de entrada</span><button type="button" onClick={() => void copyCode(activeGroup.code)} className="font-display font-black tracking-wider text-primary">{activeGroup.code}</button></div><div className="flex flex-col gap-2">{activeMembers.slice(0, 6).map((member, index) => <div key={member.userId} className="flex items-center gap-3 rounded-2xl px-2 py-2"><span className="flex size-8 items-center justify-center rounded-full bg-muted text-sm font-bold">{index + 1}</span><span className="flex-1 truncate font-semibold">{member.name}</span><span className="flex items-center gap-1 text-sm font-bold"><Medal aria-hidden="true" />{member.score}</span></div>)}</div><p className="mt-4 text-xs text-muted-foreground">Ranking por estrelas conquistadas nos desafios.</p></> : <div className="flex flex-col items-center gap-3 py-10 text-center text-muted-foreground"><UserPlus aria-hidden="true" /><p className="max-w-xs text-sm">Crie um clã ou use o código de um colega para começar a competir.</p></div>}
         </div>
+      </div>
+
+      <div className="border-t border-border bg-muted/20 px-6 py-6 sm:px-8">
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Ranking global</p><h3 className="font-display text-xl font-bold">Todos os jogadores</h3></div>
+          <Trophy className="text-primary" aria-hidden="true" />
+        </div>
+        {globalPlayers.length === 0 ? <p className="py-4 text-sm text-muted-foreground">Ainda não há pontuações registradas. Resolva um desafio para entrar no ranking.</p> : <div className="grid gap-2 md:grid-cols-2">{globalPlayers.map((player, index) => <div key={player.userId} className={cn("flex items-center gap-3 rounded-2xl border p-3", index === 0 ? "border-primary/30 bg-primary/5" : "border-border bg-background")}><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-bold">{index < 3 ? <Medal aria-hidden="true" /> : `${index + 1}º`}</span><div className="min-w-0 flex-1"><p className="truncate font-semibold">{player.name}</p><p className="text-xs text-muted-foreground">{player.completed} {player.completed === 1 ? "fase concluída" : "fases concluídas"}</p></div><span className="font-display font-bold">{player.score} pts</span></div>)}</div>}
       </div>
     </section>
   )
