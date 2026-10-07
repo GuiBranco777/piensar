@@ -4,7 +4,7 @@ export type GameLevel = "Iniciante" | "Intermediário" | "Desafio"
 export type GameId =
   | "pattern-1" | "pattern-2" | "pattern-3" | "bridge-1" | "bridge-2" | "bridge-3"
   | "combinations-1" | "combinations-2" | "combinations-3" | "area-1" | "area-2" | "area-3" | "deduction-1"
-  | "pattern-4" | "pattern-5" | "combinations-4" | "combinations-5" | "area-4" | "area-5" | "deduction-2" | "deduction-3" | "bridge-3" | "bridge-4" | "bridge-5" | "sequence-1" | "sequence-2" | "sequence-3" | "sequence-4" | "sequence-5"
+  | "pattern-4" | "pattern-5" | "combinations-4" | "combinations-5" | "area-4" | "area-5" | "deduction-2" | "deduction-3" | "bridge-3" | "bridge-4" | "sequence-1" | "sequence-2" | "sequence-3" | "sequence-4" | "sequence-5"
 
 export type Game = { id: GameId; name: string; tagline: string; description: string; icon: LucideIcon; color: string; solidBg: string; softBg: string; border: string; level: GameLevel }
 
@@ -39,7 +39,6 @@ export const GAMES: Game[] = [
   { id: "deduction-3", name: "Ordem na fila", tagline: "Organize as pistas!", description: "Determine a posição de cada estudante.", icon: Brain, level: "Desafio", ...styles.seq },
   { id: "bridge-3", name: "Caminhos no tabuleiro", tagline: "Conte sem repetir!", description: "Conte caminhos possíveis em uma malha pequena.", icon: Footprints, level: "Intermediário", ...styles.sub },
   { id: "bridge-4", name: "Moedas na balança", tagline: "Compare com estratégia!", description: "Encontre uma moeda diferente com poucas pesagens.", icon: Footprints, level: "Desafio", ...styles.sub },
-  { id: "bridge-5", name: "Robô no labirinto", tagline: "Planeje os movimentos!", description: "Determine a menor quantidade de passos.", icon: Footprints, level: "Desafio", ...styles.sub },
   { id: "sequence-1", name: "Triângulos de palitos", tagline: "Conte as figuras!", description: "Identifique quantas peças são necessárias.", icon: Shapes, level: "Iniciante", ...styles.cmp },
   { id: "sequence-2", name: "Calendário curioso", tagline: "Use a aritmética!", description: "Encontre uma data a partir de relações numéricas.", icon: Shapes, level: "Intermediário", ...styles.cmp },
   { id: "sequence-3", name: "Números vizinhos", tagline: "Procure o padrão!", description: "Analise a soma de números consecutivos.", icon: ListTree, level: "Intermediário", ...styles.add },
