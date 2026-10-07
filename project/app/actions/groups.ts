@@ -59,6 +59,14 @@ export async function getUserProgress() {
     .orderBy(desc(completions.createdAt))
 }
 
+export async function getPublicGlobalRanking() {
+  return db.select({ userId: users.id, name: users.name, score: sql<number>`coalesce(sum(${completions.stars}), 0)`, completed: sql<number>`count(${completions.id})` })
+    .from(users)
+    .leftJoin(completions, eq(users.id, completions.userId))
+    .groupBy(users.id, users.name)
+    .orderBy(desc(sql`coalesce(sum(${completions.stars}), 0)`), desc(sql`count(${completions.id})`), users.name)
+}
+
 export async function getCompetitionData() {
   const userId = await getUserId()
   const memberships = await db.select({ group: groups }).from(groupMembers).innerJoin(groups, eq(groupMembers.groupId, groups.id)).where(eq(groupMembers.userId, userId))

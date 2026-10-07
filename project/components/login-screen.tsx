@@ -2,10 +2,11 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Calculator, Sparkles, Star, Rocket } from "lucide-react"
+import { Calculator, Sparkles, Star, Rocket, Trophy } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
+import { getPublicGlobalRanking } from "@/app/actions/groups"
 
 type LoginScreenProps = {
   onAuthenticated: () => void
@@ -29,6 +30,11 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
   const [password, setPassword] = useState("")
   const [confirmation, setConfirmation] = useState("")
   const [error, setError] = useState("")
+  const [ranking, setRanking] = useState<Array<{ userId: string; name: string; score: number; completed: number }>>([])
+
+  useEffect(() => {
+    getPublicGlobalRanking().then((rows) => setRanking(rows.map((row) => ({ ...row, score: Number(row.score), completed: Number(row.completed) })))).catch(() => setRanking([]))
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -199,6 +205,10 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
           </p>
         </section>
       </div>
+      <section className="w-full max-w-4xl rounded-4xl border border-border bg-card p-6 shadow-sm md:p-8" aria-labelledby="public-ranking-title">
+        <div className="mb-5 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pontuação real</p><h2 id="public-ranking-title" className="font-display text-2xl font-bold text-foreground">Ranking global</h2><p className="mt-1 text-sm text-muted-foreground">Todos os jogadores cadastrados aparecem aqui.</p></div><Trophy className="text-primary" aria-hidden="true" /></div>
+        {ranking.length === 0 ? <p className="text-sm text-muted-foreground">Ainda não há pontuações registradas.</p> : <div className="grid gap-2 md:grid-cols-2">{ranking.map((player, index) => <div key={player.userId} className="flex items-center gap-3 rounded-2xl border border-border bg-background p-3"><span className="w-8 text-center font-bold">{index + 1}º</span><div className="min-w-0 flex-1"><p className="truncate font-semibold">{player.name}</p><p className="text-xs text-muted-foreground">{player.completed} {player.completed === 1 ? "fase concluída" : "fases concluídas"}</p></div><span className="font-display font-bold">{player.score} pts</span></div>)}</div>}
+      </section>
     </main>
   )
 }
